@@ -109,7 +109,9 @@ namespace MD.ApkMAP
                         // 是否要求Token的Claims中必须包含 Expires
                         RequireExpirationTime = true,
                         // 是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
-                        ValidateLifetime = true
+                        ValidateLifetime = true,
+                        //注意这是缓冲过期时间，总的有效时间等于这个时间加上jwt的过期时间，如果不配置，默认是5分钟
+                        ClockSkew = TimeSpan.FromSeconds(30)
                     };
                 });
             #endregion
@@ -148,7 +150,8 @@ namespace MD.ApkMAP
             });
             #endregion
 
-             app.UseMiddleware<JwtTokenAuth>();
+            // app.UseMiddleware<JwtTokenAuth>();//注意此授权方法已经放弃，请使用下边的官方授权方法。这里仅仅是授权方法的替换
+            app.UseAuthentication();
             //app.UseJwtBearerAuthentication(new JwtBearerOptions
             //{
             //    TokenValidationParameters = new TokenValidationParameters
