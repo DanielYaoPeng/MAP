@@ -63,7 +63,7 @@ namespace MD.ApkMAP
                 //方案名称“Blog.Core”可自定义，上下一致即可
                 c.AddSecurityDefinition("MD.ApkMAP", new ApiKeyScheme
                 {
-                    Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入{token}\"",
+                    Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}(注意两者之间是个空格)\"",
                     Name = "Authorization",//jwt默认的参数名称
                     In = "header",//jwt默认存放Authorization信息的位置(请求头中)
                     Type = "apiKey"
@@ -88,6 +88,12 @@ namespace MD.ApkMAP
 
 
             #region 认证，第二种验证方法
+
+            var audienceConfig = Configuration.GetSection("Audience");
+            var symmetricKeyAsBase64 = audienceConfig["Secret"];
+            var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(keyByteArray);
+
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -97,13 +103,13 @@ namespace MD.ApkMAP
                 {
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = "MD.ApkMAP",
-                        ValidAudience = "api",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtHelper.secretKey)),
-                        RequireSignedTokens = true,
+                        ValidIssuer = audienceConfig["Issuer"],//发行人,
+                        ValidAudience = audienceConfig["Audience"],//订阅人
+                        IssuerSigningKey = signingKey,
+                        //RequireSignedTokens = true,
 
                         // 将下面两个参数设置为false，可以不验证Issuer和Audience，但是不建议这样做。
-                        ValidateAudience = false,
+                        ValidateAudience = true,
                         ValidateIssuer = true, //验证JWT身份
                         ValidateIssuerSigningKey = true,
                         // 是否要求Token的Claims中必须包含 Expires
@@ -111,7 +117,7 @@ namespace MD.ApkMAP
                         // 是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
                         ValidateLifetime = true,
                         //注意这是缓冲过期时间，总的有效时间等于这个时间加上jwt的过期时间，如果不配置，默认是5分钟
-                        ClockSkew = TimeSpan.FromSeconds(30)
+                        ClockSkew = TimeSpan.Zero,
                     };
                 });
             #endregion
@@ -164,7 +170,7 @@ namespace MD.ApkMAP
             //});
             app.UseMvc();
 
-           // app.UseStaticFiles();//用于访问wwwroot下的文件 
+            // app.UseStaticFiles();//用于访问wwwroot下的文件 
         }
     }
 }

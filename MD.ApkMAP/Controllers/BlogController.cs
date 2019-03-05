@@ -12,8 +12,8 @@ namespace MD.ApkMAP.Controllers
 {
     [Produces("application/json")]
     [Route("api/Blog")]
-    [BearerAuthorize]
-    //[Authorize(Policy = "Admin")]
+    //[BearerAuthorize]
+    [Authorize(Policy = "Admin")]
     //[Authorize(Policy = "Client")]
     //[Authorize("Bearer")]
     //[Authorize]
