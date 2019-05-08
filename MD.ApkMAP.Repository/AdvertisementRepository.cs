@@ -1,9 +1,13 @@
 ﻿using Dapper;
 using MD.ApkMAP.IRepository;
+using MD.ApkMAP.Model.DBModels;
+using MD.ApkMAP.Repository.sugar;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MD.ApkMAP.Repository
@@ -13,19 +17,26 @@ namespace MD.ApkMAP.Repository
     /// </summary>
     public class AdvertisementRepository : IAdvertisementRepository
     {
-        /// <summary>
-        /// 数据库连接
-        /// </summary>
-        protected string DbConnection;
+        private DbContext context;
+        private SqlSugarClient db;
+        private SimpleClient<AdvertTest> entityDB;
 
-        protected SqlConnection OpenDbConnection()
+        internal SqlSugarClient Db
         {
-            if (DbConnection == null)
-            {
-                throw new Exception("Connection string \"DbConnection\" can not be null.");
-            }
-
-            return new SqlConnection(DbConnection);
+            get { return db; }
+            private set { db = value; }
+        }
+        public DbContext Context
+        {
+            get { return context; }
+            set { context = value; }
+        }
+        public AdvertisementRepository()
+        {
+            DbContext.Init(BaseDBConfig.ConnectionString);
+            context = DbContext.GetDbContext();
+            db = context.Db;
+            entityDB = context.GetEntityDB<AdvertTest>(db);
         }
 
         #region 查
@@ -50,6 +61,32 @@ namespace MD.ApkMAP.Repository
         public int Sum(int i, int j)
         {
             return i + j;
+        }
+
+        public async Task<int> Add(AdvertTest model)
+        {
+            // throw new NotImplementedException();
+            //返回的i是long类型,这里你可以根据你的业务需要进行处理
+            var i = await db.Insertable(model).ExecuteCommandIdentityIntoEntityAsync();
+            return i.ObjToInt();
+        }
+
+        public async Task<bool> Delete(AdvertTest model)
+        {
+            var i = await db.Deleteable(model).ExecuteCommandAsync();
+            return i > 0;
+        }
+
+        public async Task<bool> Update(AdvertTest model)
+        {
+            var i = await db.Updateable(model).ExecuteCommandAsync();
+            return i > 0;
+        }
+
+        public async Task<List<AdvertTest>> Query(Expression<Func<AdvertTest, bool>> whereExpression)
+        {
+           // return await Task.Run(()=> entityDB.GetList(whereExpression));
+            return await db.Queryable<AdvertTest>().WhereIF(whereExpression != null, whereExpression).ToListAsync();
         }
     }
 }

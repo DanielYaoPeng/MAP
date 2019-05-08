@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MD.ApkMAP.IRepository\MD.ApkMAP.IRepository.csproj" />
+    <ProjectReference Include="..\MD.ApkMAP.Model\MD.ApkMAP.Model.csproj" />
   </ItemGroup>
 
 </Project>
