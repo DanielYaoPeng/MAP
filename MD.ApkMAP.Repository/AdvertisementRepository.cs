@@ -11,7 +11,7 @@ namespace MD.ApkMAP.Repository
     /// <summary>
     /// 仓储层，具体数据库的实现
     /// </summary>
-    public class AdvertisementRepository: IAdvertisementRepository
+    public class AdvertisementRepository : IAdvertisementRepository
     {
         /// <summary>
         /// 数据库连接
@@ -29,12 +29,12 @@ namespace MD.ApkMAP.Repository
         }
 
         #region 查
-        /// <summary>
-        /// 查询所有
-        /// </summary>
-        /// <param name="sql">查询语句</param>
-        /// <param name="param">参数</param>
-        /// <returns></returns>
+        ///// <summary>
+        ///// 查询所有
+        ///// </summary>
+        ///// <param name="sql">查询语句</param>
+        ///// <param name="param">参数</param>
+        ///// <returns></returns>
         //public async Task<IEnumerable<T>> Query(string sql, object param = null)
         //{
         //    using (var conn = OpenDbConnection())

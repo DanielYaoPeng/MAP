@@ -15,6 +15,7 @@ namespace MD.ApkMAP.Services
 
         public int Sum(int i, int j)
         {
+            //这里都是处理你的业务逻辑的，业务逻辑代码放在这里
             return dal.Sum(i, j);
 
         }
