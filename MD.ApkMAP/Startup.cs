@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -42,7 +43,7 @@ namespace MD.ApkMAP
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             //services.AddScoped<ICaching, ApkMapMemoryCache>();//系统缓存注入
-
+            var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
             #region Swagger
             services.AddSwaggerGen(c =>
             {
@@ -57,7 +58,7 @@ namespace MD.ApkMAP
 
                 //就是这里
 
-                var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
+               
                 var xmlPath = Path.Combine(basePath, "MD.ApkMAP.xml");//这个就是刚刚配置的xml文件名
                 c.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
 
@@ -144,10 +145,24 @@ namespace MD.ApkMAP
             #endregion
             #endregion
 
+            var servicesDllFile = Path.Combine(basePath, "MD.ApkMAP.Services.dll");
+            var assemblysServices = Assembly.LoadFrom(servicesDllFile);//直接采用加载文件的方法  ※※★※※ 如果你是第一次下载项目，请先F6编译，然后再F5执行，※※★※※
+
+            var repositoryDllFile = Path.Combine(basePath, "MD.ApkMAP.Repository.dll");
+            var assemblysRepository = Assembly.LoadFrom(repositoryDllFile);
+           
+
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
-            containerBuilder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
-            containerBuilder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
+
+            containerBuilder.RegisterAssemblyTypes(assemblysServices)
+                          .AsImplementedInterfaces()
+                          .InstancePerLifetimeScope();
+            containerBuilder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
+
+            //***第二种注册方式，单个一一注册
+            //containerBuilder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
+            //containerBuilder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
+            //containerBuilder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
             //将services填充到Autofac容器生成器中
             containerBuilder.Populate(services);
 
