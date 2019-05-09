@@ -31,13 +31,13 @@ namespace MD.ApkMAP.Repository
             get { return context; }
             set { context = value; }
         }
-        public AdvertisementRepository()
-        {
-            DbContext.Init(BaseDBConfig.ConnectionString);
-            context = DbContext.GetDbContext();
-            db = context.Db;
-            entityDB = context.GetEntityDB<AdvertTest>(db);
-        }
+        //public AdvertisementRepository()
+        //{
+        //    DbContext.Init(BaseDBConfig.ConnectionString);
+        //    context = DbContext.GetDbContext();
+        //    db = context.Db;
+        //    entityDB = context.GetEntityDB<AdvertTest>(db);
+        //}
 
         #region 查
         ///// <summary>

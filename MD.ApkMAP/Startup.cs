@@ -4,8 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using MD.ApkMAP.AOP;
 using MD.ApkMAP.AuthHelper.OverWrite;
+using MD.ApkMAP.IRepository;
+using MD.ApkMAP.IServices;
+using MD.ApkMAP.Repository;
+using MD.ApkMAP.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,11 +37,11 @@ namespace MD.ApkMAP
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddScoped<ICaching, ApkMapMemoryCache>();//系统缓存注入
+            //services.AddScoped<ICaching, ApkMapMemoryCache>();//系统缓存注入
 
             #region Swagger
             services.AddSwaggerGen(c =>
@@ -138,6 +144,17 @@ namespace MD.ApkMAP
             #endregion
             #endregion
 
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
+            containerBuilder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
+            containerBuilder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
+            //将services填充到Autofac容器生成器中
+            containerBuilder.Populate(services);
+
+            //使用已进行的组件登记创建新容器
+            var ApplicationContainer = containerBuilder.Build();
+
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

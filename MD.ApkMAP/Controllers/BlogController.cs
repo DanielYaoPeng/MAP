@@ -19,6 +19,11 @@ namespace MD.ApkMAP.Controllers
     //[Authorize]
     public class BlogController: Controller
     {
+        IAdvertisementServices _advertisementServices;
+        public BlogController(IAdvertisementServices advertisementServices)
+        {
+            _advertisementServices = advertisementServices;
+        }
         // GET: api/Blog
         /// <summary>
         /// Sum接口
@@ -29,8 +34,7 @@ namespace MD.ApkMAP.Controllers
         [HttpGet]
         public int Get(int i, int j)
         {
-            IAdvertisementServices advertisementServices = new AdvertisementServices();
-            return advertisementServices.Sum(i, j);
+            return _advertisementServices.Sum(i, j);
         }
 
     }
