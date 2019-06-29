@@ -3,7 +3,7 @@ using System;
 
 namespace MD.ApkMAP.Model
 {
-    /// </summary>
+    
     public class BaseConfigModel
     {
         /// <summary>
