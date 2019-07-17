@@ -13,8 +13,8 @@ namespace MD.ApkMAP.Controllers
         /// <summary>
         /// 获取JWT的重写方法，推荐这种，注意在文件夹OverWrite下
         /// </summary>
-        /// <param name="id">id</param>
-        /// <param name="sub">角色</param>
+        /// <param name="name">名称</param>
+        /// <param name="pass">密码</param>
         /// <returns></returns>
         [HttpGet]
         [Route("Token2")]
@@ -30,7 +30,7 @@ namespace MD.ApkMAP.Controllers
                 tokenModel.Uid = 1;
                 tokenModel.Role = "Admin";
                 tokenModel.Phone = "12342";
-                tokenModel.Project = "明道";
+                tokenModel.Project = "上海明道";
 
                 jwtStr = JwtHelper.IssueJWT(tokenModel);
                 suc = true;
