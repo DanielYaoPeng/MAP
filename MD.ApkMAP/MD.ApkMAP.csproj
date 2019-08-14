@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MD.Apk.MAP.Services\MD.ApkMAP.Services.csproj" />
-    <ProjectReference Include="..\MD.ApkMAP.Common\MD.ApkMAP.Common.csproj" />
     <ProjectReference Include="..\MD.ApkMAP.IServices\MD.ApkMAP.IServices.csproj" />
   </ItemGroup>
 

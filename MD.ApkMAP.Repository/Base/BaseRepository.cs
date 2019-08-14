@@ -1,4 +1,5 @@
-﻿using MD.ApkMAP.IRepository.Base;
+﻿using MD.ApkMAP.Common.Helper;
+using MD.ApkMAP.IRepository.Base;
 using MD.ApkMAP.Repository.sugar;
 using SqlSugar;
 using System;
@@ -30,7 +31,9 @@ namespace MD.ApkMAP.Repository.Base
         }
         public BaseRepository()
         {
-            DbContext.Init(BaseDBConfig.ConnectionString);
+            var str = BaseDBConfig.ConnectionString;
+            //var str = Appsettings.app(new string[] { "SqlServer", "SqlServerConnection" });
+            DbContext.Init(str);
             _context = DbContext.GetDbContext();
             _db = _context.Db;
             _entityDb = _context.GetEntityDB<T>(_db);
