@@ -23,7 +23,7 @@ namespace MD.ApkMAP.Controllers
             string jwtStr = string.Empty;
             bool suc = false;
             //这里就是用户登陆以后，通过数据库去调取数据，分配权限的操作
-            //这里直接写死了
+            //这里直接写死了 尝试缓存
             if (name == "admins" && pass == "admins")
             {
                 TokenModel tokenModel = new TokenModel();
