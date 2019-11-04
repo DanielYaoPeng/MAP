@@ -12,11 +12,7 @@ namespace MD.ApkMAP.Controllers
 {
     [Produces("application/json")]
     [Route("api/Blog")]
-    //[BearerAuthorize]
-    [Authorize(Policy = "Admin")]
-    //[Authorize(Policy = "Client")]
-    //[Authorize("Bearer")]
-    //[Authorize]
+    [Authorize]
     public class BlogController: Controller
     {
         IAdvertisementServices _advertisementServices;

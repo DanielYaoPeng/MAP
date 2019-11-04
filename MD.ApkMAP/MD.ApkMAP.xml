@@ -35,7 +35,7 @@
             <param name="tokenModel"></param>
             <returns></returns>
         </member>
-        <member name="M:MD.ApkMAP.AuthHelper.OverWrite.JwtHelper.SerializeJWT(System.String)">
+        <member name="M:MD.ApkMAP.AuthHelper.OverWrite.JwtHelper.SerializeJwt(System.String)">
             <summary>
             解析
             </summary>
@@ -104,6 +104,112 @@
             <param name="httpContext"></param>
             <returns></returns>
         </member>
+        <member name="M:MD.ApkMAP.AuthHelper.Policys.JwtToken.BuildJwtToken(System.Security.Claims.Claim[],MD.ApkMAP.AuthHelper.Policys.PermissionRequirement)">
+            <summary>
+            获取基于JWT的Token
+            </summary>
+            <param name="claims">需要在登陆的时候配置</param>
+            <param name="permissionRequirement">在startup中定义的参数</param>
+            <returns></returns>
+        </member>
+        <member name="T:MD.ApkMAP.AuthHelper.Policys.PermissionHandler">
+            <summary>
+            权限授权处理器
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionHandler.Schemes">
+            <summary>
+            验证方案提供对象
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionHandler.RoleModulePermissionServices">
+            <summary>
+            services 层注入
+            </summary>
+        </member>
+        <member name="M:MD.ApkMAP.AuthHelper.Policys.PermissionHandler.#ctor(Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider,MD.ApkMAP.IServices.IRoleModulePermissionServices,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            构造函数注入
+            </summary>
+            <param name="schemes"></param>
+            <param name="roleModulePermissionServices"></param>
+            <param name="accessor"></param>
+        </member>
+        <member name="T:MD.ApkMAP.AuthHelper.Policys.PermissionItem">
+            <summary>
+            用户或角色或其他凭据实体(就像是订单详情一样)
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionItem.Role">
+            <summary>
+            用户或角色或其他凭据名称
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionItem.Url">
+            <summary>
+            请求Url
+            </summary>
+        </member>
+        <member name="T:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement">
+            <summary>
+            必要参数类，类似一个订单信息
+            继承 IAuthorizationRequirement，用于设计自定义权限处理器PermissionHandler
+            因为AuthorizationHandler 中的泛型参数 TRequirement 必须继承 IAuthorizationRequirement
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.Permissions">
+            <summary>
+            用户权限集合，一个订单包含了很多详情，
+            同理，一个网站的认证发行中，也有很多权限详情(这里是Role和URL的关系)
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.DeniedAction">
+            <summary>
+            无权限action
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.ClaimType">
+            <summary>
+            认证授权类型
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.LoginPath">
+            <summary>
+            请求路径
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.Issuer">
+            <summary>
+            发行人
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.Audience">
+            <summary>
+            订阅人
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.Expiration">
+            <summary>
+            过期时间
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.SigningCredentials">
+            <summary>
+            签名验证
+            </summary>
+        </member>
+        <member name="M:MD.ApkMAP.AuthHelper.Policys.PermissionRequirement.#ctor(System.String,System.Collections.Generic.List{MD.ApkMAP.AuthHelper.Policys.PermissionItem},System.String,System.String,System.String,Microsoft.IdentityModel.Tokens.SigningCredentials,System.TimeSpan)">
+            <summary>
+            构造
+            </summary>
+            <param name="deniedAction">拒约请求的url</param>
+            <param name="permissions">权限集合</param>
+            <param name="claimType">声明类型</param>
+            <param name="issuer">发行人</param>
+            <param name="audience">订阅人</param>
+            <param name="signingCredentials">签名验证实体</param>
+            <param name="expiration">过期时间</param>
+        </member>
         <member name="M:MD.ApkMAP.Controllers.BlogController.Get(System.Int32,System.Int32)">
             <summary>
             Sum接口
@@ -112,12 +218,36 @@
             <param name="j">参数j</param>
             <returns></returns>
         </member>
+        <member name="M:MD.ApkMAP.Controllers.LoginController.#ctor(MD.ApkMAP.IServices.ISysUserInfoServices,MD.ApkMAP.AuthHelper.Policys.PermissionRequirement)">
+            <summary>
+            构造函数注入
+            </summary>
+            <param name="sysUserInfoServices"></param>
+            <param name="userRoleServices"></param>
+            <param name="roleServices"></param>
+            <param name="requirement"></param>
+        </member>
         <member name="M:MD.ApkMAP.Controllers.LoginController.GetJWTStr(System.String,System.String)">
             <summary>
             获取JWT的重写方法，推荐这种，注意在文件夹OverWrite下
             </summary>
             <param name="name">名称</param>
             <param name="pass">密码</param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.Controllers.LoginController.GetJwtToken3(System.String,System.String)">
+            <summary>
+            获取JWT的方法3：整个系统主要方法
+            </summary>
+            <param name="name"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.Controllers.LoginController.RefreshToken(System.String)">
+            <summary>
+            请求刷新Token（以旧换新）
+            </summary>
+            <param name="token"></param>
             <returns></returns>
         </member>
     </members>

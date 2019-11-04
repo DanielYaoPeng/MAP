@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using MD.ApkMAP.AOP;
 using MD.ApkMAP.AuthHelper.OverWrite;
+using MD.ApkMAP.AuthHelper.Policys;
+using MD.ApkMAP.Common.GlobalVar;
 using MD.ApkMAP.IRepository;
 using MD.ApkMAP.IServices;
 using MD.ApkMAP.Repository;
 using MD.ApkMAP.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -91,17 +95,18 @@ namespace MD.ApkMAP
 
             #region JWT
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
-                options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
-                options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
-                options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
-            });
+            #region 1、 授权
 
+            //简单版本  controller上打标签 这么写 [Authorize(Policy = "Admin")]
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
+            //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
+            //    options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
+            //    options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
+            //});
 
-           
-
+            //复杂版本
 
             var audienceConfig = Configuration.GetSection("Audience");
             var symmetricKeyAsBase64 = audienceConfig["Secret"];
@@ -109,6 +114,30 @@ namespace MD.ApkMAP
             var signingKey = new SymmetricSecurityKey(keyByteArray);
 
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+            // 如果要数据库动态绑定，这里先留个空，后边处理器里动态赋值
+            var permission = new List<PermissionItem>();
+
+            // 角色与接口的权限要求参数
+            var permissionRequirement = new PermissionRequirement(
+                "/api/denied",// 拒绝授权的跳转地址（目前无用）
+                permission,
+                ClaimTypes.Role,//基于角色的授权
+                audienceConfig["Issuer"],//发行人
+                audienceConfig["Audience"],//听众
+                signingCredentials,//签名凭据
+                expiration: TimeSpan.FromSeconds(60 * 2)//接口的过期时间
+                );
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Permissions.Name,
+                         policy => policy.Requirements.Add(permissionRequirement));
+            });
+            #endregion
+
+
+            #region 2、配置服务
 
             // 令牌验证参数
             var tokenValidationParameters = new TokenValidationParameters
@@ -149,15 +178,10 @@ namespace MD.ApkMAP
                     };
                 });
 
-            #region token服务注册
+            // 注入权限处理器
 
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
-            //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
-            //    options.AddPolicy("AdminOrClient", policy => policy.RequireRole("Admin,Client").Build());
-            //});
-
+            services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+            services.AddSingleton(permissionRequirement);
 
             #endregion
 

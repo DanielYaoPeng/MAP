@@ -52,7 +52,7 @@ namespace MD.ApkMAP.AuthHelper.OverWrite
             }
             // var tokenHeader = httpContext.Request.Headers["Authorization"].ToString();
             var tokenHeader = httpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            TokenModel tm = JwtHelper.SerializeJWT(tokenHeader);//序列化token，获取授权
+            TokenModel tm = JwtHelper.SerializeJwt(tokenHeader);//序列化token，获取授权
 
             ////授权 注意这个可以添加多个角色声明，请注意这是一个 list
             //var claimList = new List<Claim>();

@@ -128,14 +128,15 @@ namespace MD.ApkMAP.AuthHelper.OverWrite
         /// </summary>
         /// <param name="jwtStr"></param>
         /// <returns></returns>
-        public static TokenModel SerializeJWT(string jwtStr)
+        public static TokenModel SerializeJwt(string jwtStr)
         {
             var jwtHandler = new JwtSecurityTokenHandler();
             JwtSecurityToken jwtToken = jwtHandler.ReadJwtToken(jwtStr);
             object role = new object(); ;
             try
             {
-                jwtToken.Payload.TryGetValue("Role", out role);
+                //jwtToken.Payload.TryGetValue("Role", out role);
+                jwtToken.Payload.TryGetValue(ClaimTypes.Role, out role);
             }
             catch (Exception e)
             {

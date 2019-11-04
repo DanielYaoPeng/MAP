@@ -17,4 +17,8 @@
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="sqlSugarCore" Version="5.0.0.8" />
+  </ItemGroup>
+
 </Project>
