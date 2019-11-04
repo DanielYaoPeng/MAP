@@ -23,6 +23,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace MD.ApkMAP
@@ -36,42 +38,51 @@ namespace MD.ApkMAP
 
         public IConfiguration Configuration { get; }
 
-
+        private const string ApiName = "ApkMAP";
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllers();
+
+            services.AddSingleton<IMemoryCache>(factory =>
+            {
+                var cache = new MemoryCache(new MemoryCacheOptions());
+                return cache;
+            });
 
             //services.AddScoped<ICaching, ApkMapMemoryCache>();//系统缓存注入
             var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
             #region Swagger
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
+                c.SwaggerDoc("V1", new OpenApiInfo
                 {
-                    Version = "v0.1.0",
-                    Title = "MD.ApkMAP API",
+                    Version = "V1",
+                    Title = $"{ApiName} 接口文档——Netcore 3.0",
                     Description = "应用包MAP Api文档",
-                    TermsOfService = "None",
-                    Contact = new Swashbuckle.AspNetCore.Swagger.Contact { Name = "ApkMAP", Url = "https://www.mingdao.com" }
+                    Contact = new OpenApiContact { Name = ApiName, Email = "yaopeng", Url = new Uri("https://www.mingdao.com") },
+                    License = new OpenApiLicense { Name = ApiName, Url = new Uri("https://www.mingdao.com") }
                 });
-                
-               
+                c.OrderActionsBy(o => o.RelativePath);
+
                 var xmlPath = Path.Combine(basePath, "MD.ApkMAP.xml");//这个就是刚刚配置的xml文件名
                 c.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
 
                 #region 绑定token 到ConfigureServices 在swagger上显示认证信息
-                //添加header验证信息
-                //c.OperationFilter<SwaggerHeader>();
-                var security = new Dictionary<string, IEnumerable<string>> { { "MD.ApkMAP", new string[] { } }, };
-                c.AddSecurityRequirement(security);
+
+
+                c.OperationFilter<AddResponseHeadersFilter>();
+                c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+
+                c.OperationFilter<SecurityRequirementsOperationFilter>();
+
                 //方案名称“Blog.Core”可自定义，上下一致即可
-                c.AddSecurityDefinition("MD.ApkMAP", new ApiKeyScheme
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}(注意两者之间是个空格)\"",
                     Name = "Authorization",//jwt默认的参数名称
-                    In = "header",//jwt默认存放Authorization信息的位置(请求头中)
-                    Type = "apiKey"
+                    In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
+                    Type = SecuritySchemeType.ApiKey
                 });
                 #endregion
             });
@@ -79,126 +90,164 @@ namespace MD.ApkMAP
             #endregion
 
             #region JWT
-            //无身份注册
-            //services.AddAuthentication().AddJwtBearer(jwtOptions =>
-            //{
-            //    jwtOptions.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtHelper.secretKey)),
-            //        //ValidAudience = "1",
-            //        //ValidIssuer = "1",
-            //        ValidateLifetime = true
-            //    };
-            //});
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
+                options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
+                options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
+            });
 
 
-            #region 认证，第二种验证方法
+           
+
 
             var audienceConfig = Configuration.GetSection("Audience");
             var symmetricKeyAsBase64 = audienceConfig["Secret"];
             var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyByteArray);
 
-            services.AddAuthentication(x =>
+            var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+            // 令牌验证参数
+            var tokenValidationParameters = new TokenValidationParameters
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+                ValidIssuer = audienceConfig["Issuer"],//发行人,
+                ValidAudience = audienceConfig["Audience"],//订阅人
+                IssuerSigningKey = signingKey,
+                //RequireSignedTokens = true,
+
+                // 将下面两个参数设置为false，可以不验证Issuer和Audience，但是不建议这样做。
+                ValidateAudience = true,
+                ValidateIssuer = true, //验证JWT身份
+                ValidateIssuerSigningKey = true,
+                // 是否要求Token的Claims中必须包含 Expires
+                RequireExpirationTime = true,
+                // 是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
+                ValidateLifetime = true,
+                //注意这是缓冲过期时间，总的有效时间等于这个时间加上jwt的过期时间，如果不配置，默认是5分钟
+                ClockSkew = TimeSpan.Zero,
+            };
+
+
+            services.AddAuthentication("Bearer")
                 .AddJwtBearer(o =>
                 {
-                    o.TokenValidationParameters = new TokenValidationParameters
+                    o.TokenValidationParameters = tokenValidationParameters;
+                    o.Events = new JwtBearerEvents
                     {
-                        ValidIssuer = audienceConfig["Issuer"],//发行人,
-                        ValidAudience = audienceConfig["Audience"],//订阅人
-                        IssuerSigningKey = signingKey,
-                        //RequireSignedTokens = true,
-
-                        // 将下面两个参数设置为false，可以不验证Issuer和Audience，但是不建议这样做。
-                        ValidateAudience = true,
-                        ValidateIssuer = true, //验证JWT身份
-                        ValidateIssuerSigningKey = true,
-                        // 是否要求Token的Claims中必须包含 Expires
-                        RequireExpirationTime = true,
-                        // 是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
-                        ValidateLifetime = true,
-                        //注意这是缓冲过期时间，总的有效时间等于这个时间加上jwt的过期时间，如果不配置，默认是5分钟
-                        ClockSkew = TimeSpan.Zero,
+                        OnAuthenticationFailed = context =>
+                        {
+                            // 如果过期，则把<是否过期>添加到，返回头信息中
+                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                            {
+                                context.Response.Headers.Add("Token-Expired", "true");
+                            }
+                            return Task.CompletedTask;
+                        }
                     };
                 });
-            #endregion
-
 
             #region token服务注册
-            services.AddSingleton<IMemoryCache>(factory =>
-            {
-                var cache = new MemoryCache(new MemoryCacheOptions());
-                return cache;
-            });
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
-                options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
-                options.AddPolicy("AdminOrClient", policy => policy.RequireRole("Admin,Client").Build());
-            });
+
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
+            //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
+            //    options.AddPolicy("AdminOrClient", policy => policy.RequireRole("Admin,Client").Build());
+            //});
+
+
             #endregion
+
             #endregion
+
+
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            /*
+             * 3.0把接口的注入放到这里了，
+            ConfigureServices 不能是返回类型了，只能是 void 方法，那我们就不用 return 出去了，
+            官方给我们提供了一个服务提供上工厂，我们从这个工厂里拿，而不是将服务配置 return 出去
+            */
+            var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
+
+
+            builder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
+
 
             var servicesDllFile = Path.Combine(basePath, "MD.ApkMAP.Services.dll");
             var assemblysServices = Assembly.LoadFrom(servicesDllFile);//直接采用加载文件的方法  ※※★※※ 如果你是第一次下载项目，请先F6编译，然后再F5执行，※※★※※
 
             var repositoryDllFile = Path.Combine(basePath, "MD.ApkMAP.Repository.dll");
             var assemblysRepository = Assembly.LoadFrom(repositoryDllFile);
-           
 
-            var containerBuilder = new ContainerBuilder();
 
-            containerBuilder.RegisterAssemblyTypes(assemblysServices)
+
+            builder.RegisterAssemblyTypes(assemblysServices)
                           .AsImplementedInterfaces()
                           .InstancePerLifetimeScope();
-            containerBuilder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
 
             //***第二种注册方式，单个一一注册
             //containerBuilder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
             //containerBuilder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
             //containerBuilder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
             //将services填充到Autofac容器生成器中
-            containerBuilder.Populate(services);
+            //containerBuilder.Populate(services);
 
-            //使用已进行的组件登记创建新容器
-            var ApplicationContainer = containerBuilder.Build();
-
-            return new AutofacServiceProvider(ApplicationContainer);
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            #region Swagger
+            // 使用静态文件
+            app.UseStaticFiles();
+
+            app.UseRouting();//路由中间件
+                             // 短路中间件，配置Controller路由
+
+            // 使用cookie
+            app.UseCookiePolicy();
+            // 返回错误码
+            app.UseStatusCodePages();//把错误码返回前台，比如是404
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiHelp V1");
-            });
-            #endregion
+                c.SwaggerEndpoint($"/swagger/V1/swagger.json", $"{ApiName} V1");
 
-            // app.UseMiddleware<JwtTokenAuth>();//注意此授权方法已经放弃，请使用下边的官方授权方法。这里仅仅是授权方法的替换
-            app.UseAuthentication();
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions
-            //{
-            //    TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        IssuerSigningKey = _tokenOptions.Key,
-            //        ValidAudience = _tokenOptions.Audience, // 设置接收者必须是 TestAudience
-            //        ValidIssuer = _tokenOptions.Issuer, // 设置签发者必须是 TestIssuer
-            //        ValidateLifetime = true
-            //    }
-            //});
-            app.UseMvc();
+                //路径配置，设置为空，表示直接在根域名（localhost:8001）访问该文件,注意localhost:8001/swagger是访问不到的，去launchSettings.json把launchUrl去掉，如果你想换一个路径，直接写名字即可，比如直接写c.RoutePrefix = "doc";
+                c.RoutePrefix = "";
+            });
+
+            // app.UseMiniProfiler();
+
+           
+
+
+          
 
             // app.UseStaticFiles();//用于访问wwwroot下的文件 
         }

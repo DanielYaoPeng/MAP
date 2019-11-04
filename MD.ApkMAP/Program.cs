@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac.Extensions.DependencyInjection;
 using MD.ApkMAP.Common;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace MD.ApkMAP
@@ -18,7 +20,7 @@ namespace MD.ApkMAP
         {
 
             // 生成承载 web 应用程序的 Microsoft.AspNetCore.Hosting.IWebHost。Build是WebHostBuilder最终的目的，将返回一个构造的WebHost，最终生成宿主。
-           var host=  CreateWebHostBuilder(args).Build();
+           var host= CreateHostBuilder(args).Build();
 
             // 创建可用于解析作用域服务的新 Microsoft.Extensions.DependencyInjection.IServiceScope。 启动之前，直接加载数据库相关服务
             //using (var scope = host.Services.CreateScope())
@@ -49,21 +51,12 @@ namespace MD.ApkMAP
         }
 
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            //使用预配置的默认值初始化 Microsoft.AspNetCore.Hosting.WebHostBuilder 类的新实例。
-            WebHost.CreateDefaultBuilder(args)
-                //指定要由 web 主机使用的启动类型。相当于注册了一个IStartup服务。可以自定义启动服务，比如.UseStartup(typeof(StartupDevelopment).GetTypeInfo().Assembly.FullName)
-                //.UseUrls("http://localhost:5012")
-                .UseStartup<Startup>();
-
-        //public static void Main(string[] args)
-        //{
-        //    BuildWebHost(args).Run();
-        //}
-
-        //public static IWebHost BuildWebHost(string[] args) =>
-        //    WebHost.CreateDefaultBuilder(args)
-        //        .UseStartup<Startup>()
-        //        .Build();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+             Host.CreateDefaultBuilder(args)
+              .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+                 .ConfigureWebHostDefaults(webBuilder =>
+                 {
+                     webBuilder.UseStartup<Startup>();
+                 });
     }
 }

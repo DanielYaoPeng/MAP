@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MD.ApkMAP</name>
+    </assembly>
+    <members>
+        <member name="M:MD.ApkMAP.AOP.ApkMapMemoryCache.Exists(System.String)">
+            <summary>
+            验证缓存项是否存在
+            </summary>
+            <param name="key">缓存Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.AOP.ApkMapMemoryCache.Get(System.String)">
+            <summary>
+            获取缓存
+            </summary>
+            <param name="key">缓存Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.AOP.ApkMapMemoryCache.Set(System.String,System.Object,System.TimeSpan,System.TimeSpan)">
+            <summary>
+            添加缓存
+            </summary>
+            <param name="key">缓存Key</param>
+            <param name="value">缓存Value</param>
+            <param name="expiresSliding">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间）</param>
+            <param name="expiressAbsoulte">绝对过期时长</param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.AuthHelper.OverWrite.JwtHelper.IssueJWT(MD.ApkMAP.AuthHelper.OverWrite.TokenModel)">
+            <summary>
+            颁发JWT字符串
+            </summary>
+            <param name="tokenModel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.AuthHelper.OverWrite.JwtHelper.SerializeJWT(System.String)">
+            <summary>
+            解析
+            </summary>
+            <param name="jwtStr"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MD.ApkMAP.AuthHelper.OverWrite.TokenModel">
+            <summary>
+            令牌类
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Uid">
+            <summary>
+            用户Id
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Role">
+            <summary>
+            身份
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Uname">
+            <summary>
+            用户名
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Phone">
+            <summary>
+            手机
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Icon">
+            <summary>
+            头像
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.UNickname">
+            <summary>
+            昵称
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Sub">
+            <summary>
+            身份
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.AuthHelper.OverWrite.TokenModel.Project">
+            <summary>
+            网络
+            </summary>
+        </member>
+        <member name="T:MD.ApkMAP.AuthHelper.OverWrite.JwtTokenAuth">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:MD.ApkMAP.AuthHelper.OverWrite.JwtTokenAuth._next">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:MD.ApkMAP.AuthHelper.OverWrite.JwtTokenAuth.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            自定义请求验证中间件（JWT官方不走这个）
+            </summary>
+            <param name="httpContext"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.Controllers.BlogController.Get(System.Int32,System.Int32)">
+            <summary>
+            Sum接口
+            </summary>
+            <param name="i">参数i</param>
+            <param name="j">参数j</param>
+            <returns></returns>
+        </member>
+        <member name="M:MD.ApkMAP.Controllers.LoginController.GetJWTStr(System.String,System.String)">
+            <summary>
+            获取JWT的重写方法，推荐这种，注意在文件夹OverWrite下
+            </summary>
+            <param name="name">名称</param>
+            <param name="pass">密码</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
