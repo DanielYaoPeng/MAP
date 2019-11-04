@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -47,6 +48,7 @@ namespace MD.ApkMAP
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IMemoryCache>(factory =>
             {
@@ -98,13 +100,13 @@ namespace MD.ApkMAP
             #region 1、 授权
 
             //简单版本  controller上打标签 这么写 [Authorize(Policy = "Admin")]
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
-            //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
-            //    options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
-            //    options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
-            //});
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
+                options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
+                options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
+            });
 
             //复杂版本
 
@@ -199,9 +201,7 @@ namespace MD.ApkMAP
             */
             var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
 
-
-            builder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
-
+            // builder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
 
             var servicesDllFile = Path.Combine(basePath, "MD.ApkMAP.Services.dll");
             var assemblysServices = Assembly.LoadFrom(servicesDllFile);//直接采用加载文件的方法  ※※★※※ 如果你是第一次下载项目，请先F6编译，然后再F5执行，※※★※※
@@ -214,10 +214,14 @@ namespace MD.ApkMAP
             builder.RegisterAssemblyTypes(assemblysServices)
                           .AsImplementedInterfaces()
                           .InstancePerLifetimeScope();
+
             builder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
 
+
+            builder.RegisterType<RoleModulePermissionServices>().As<IRoleModulePermissionServices>().InstancePerDependency();
+
+
             //***第二种注册方式，单个一一注册
-            //containerBuilder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
             //containerBuilder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
             //containerBuilder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
             //将services填充到Autofac容器生成器中
@@ -268,10 +272,10 @@ namespace MD.ApkMAP
 
             // app.UseMiniProfiler();
 
-           
 
 
-          
+
+
 
             // app.UseStaticFiles();//用于访问wwwroot下的文件 
         }

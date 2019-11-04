@@ -1,4 +1,5 @@
 ﻿using MD.ApkMAP.AuthHelper.OverWrite;
+using MD.ApkMAP.Common.GlobalVar;
 using MD.ApkMAP.IServices;
 using MD.ApkMAP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ namespace MD.ApkMAP.Controllers
 {
     [Produces("application/json")]
     [Route("api/Blog")]
-    [Authorize]
+    [Authorize(Permissions.Name)]
     public class BlogController: Controller
     {
         IAdvertisementServices _advertisementServices;
