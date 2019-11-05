@@ -10,6 +10,8 @@ namespace MD.ApkMAP.Common.GlobalVar
     public static class Permissions
     {
         public const string Name = "Permission";
+
+        public const string Admin = "Admin";
     }
 
     /// <summary>
@@ -24,4 +26,5 @@ namespace MD.ApkMAP.Common.GlobalVar
         /// </summary>
         public const string Name = "";
     }
+
 }

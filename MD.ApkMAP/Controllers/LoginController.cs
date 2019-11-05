@@ -10,6 +10,7 @@ using MD.ApkMAP.AuthHelper.Policys;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MD.ApkMAP.IServices;
+using MD.ApkMAP.Common.GlobalVar;
 
 namespace MD.ApkMAP.Controllers
 {
@@ -52,7 +53,7 @@ namespace MD.ApkMAP.Controllers
             {
                 TokenModel tokenModel = new TokenModel();
                 tokenModel.Uid = 1;
-                tokenModel.Role = "Admin";
+                tokenModel.Role = Permissions.Admin;
                 tokenModel.Phone = "12342";
                 tokenModel.Project = "上海明道";
 
