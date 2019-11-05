@@ -100,13 +100,13 @@ namespace MD.ApkMAP
             #region 1、 授权
 
             //简单版本  controller上打标签 这么写 [Authorize(Policy = "Admin")]
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
-                options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
-                options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
-                options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
-            });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("Client", policy => policy.RequireRole("Client").Build());
+            //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin").Build());
+            //    options.AddPolicy("SystemOrAdmin", policy => policy.RequireRole("Admin", "System"));
+            //    options.AddPolicy("A_S_O", policy => policy.RequireRole("Admin", "System", "Others"));
+            //});
 
             //复杂版本
 
@@ -217,8 +217,6 @@ namespace MD.ApkMAP
 
             builder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
 
-
-            builder.RegisterType<RoleModulePermissionServices>().As<IRoleModulePermissionServices>().InstancePerDependency();
 
 
             //***第二种注册方式，单个一一注册
