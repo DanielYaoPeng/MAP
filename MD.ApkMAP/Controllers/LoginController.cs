@@ -81,6 +81,7 @@ namespace MD.ApkMAP.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("JWTToken3.0")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<object> GetJwtToken3(string name = "", string pass = "")
         {
             //string jwtStr = string.Empty;
