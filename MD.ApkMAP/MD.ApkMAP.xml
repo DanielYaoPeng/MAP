@@ -218,6 +218,13 @@
             <param name="j">参数j</param>
             <returns></returns>
         </member>
+        <member name="M:MD.ApkMAP.Controllers.BlogController.Post(MD.ApkMAP.Dto.Love)">
+            <summary>
+            测试post body
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:MD.ApkMAP.Controllers.LoginController.#ctor(MD.ApkMAP.IServices.ISysUserInfoServices,MD.ApkMAP.AuthHelper.Policys.PermissionRequirement)">
             <summary>
             构造函数注入
@@ -249,6 +256,26 @@
             </summary>
             <param name="token"></param>
             <returns></returns>
+        </member>
+        <member name="T:MD.ApkMAP.Dto.Love">
+            <summary>
+            这是爱
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.Dto.Love.Id">
+            <summary>
+            id
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.Dto.Love.Name">
+            <summary>
+            姓名
+            </summary>
+        </member>
+        <member name="P:MD.ApkMAP.Dto.Love.Age">
+            <summary>
+            年龄
+            </summary>
         </member>
     </members>
 </doc>

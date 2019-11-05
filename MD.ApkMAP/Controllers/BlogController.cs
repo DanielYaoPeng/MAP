@@ -1,5 +1,6 @@
 ﻿using MD.ApkMAP.AuthHelper.OverWrite;
 using MD.ApkMAP.Common.GlobalVar;
+using MD.ApkMAP.Dto;
 using MD.ApkMAP.IServices;
 using MD.ApkMAP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -34,5 +35,16 @@ namespace MD.ApkMAP.Controllers
             return _advertisementServices.Sum(i, j);
         }
 
+        /// <summary>
+        /// 测试post body
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [AllowAnonymous]
+        public Love Post([FromBody]Love request)
+        {
+            return request;
+        }
     }
 }
