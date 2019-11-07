@@ -36,7 +36,7 @@
         <header>
             <div class="description">
                 <div style="background-image: url(https://pic.cnblogs.com/avatar/1468246/20180817230353.png); width: 128px; height: 128px; background-size: cover; border-radius: 50%; margin: 0 auto;"
-                    v-on:click="alert('我是老张的哲学的头像')">
+                     v-on:click="alert('我是头像')">
                 </div>
                 <p class="name" v-text="author"> 博客园：{{ name }}</p>
                 <p class="desc">Software Engineer.Currently working in Microsoft co-operation.</p>
@@ -67,8 +67,10 @@
             <h2 class="hr">
                 <span>About Me</span>
             </h2>
-            <p>My name is <span v-html="author"></span>. An amateur programmer who writes code every day and watches
-                movies every day.</p>
+            <p>
+                My name is <span v-html="author"></span>. An amateur programmer who writes code every day and watches
+                movies every day.
+            </p>
             <h2 class="hr">
                 <span>featured</span>
             </h2>
@@ -83,24 +85,29 @@
                 </li>
             </ul>
             <div>
-                    <div v-if="list.length > 20 ">
-                        MOST
-                    </div>
-                    <div v-else-if="list.length > 6 ">
-                        MORE
-                    </div>
-                    <div v-else>
-                        ALL
-                    </div>
+                <div v-if="list.length > 20 ">
+                    MOST
                 </div>
-                <h2 class="hr">
-                        <span>Skills</span>
-                    </h2>
-                    <ul class="skill-list non-style-list">
-                        <li v-for='(item, key) in list3' class="post-list-item">{{key}}、{{item.name}}</li>
-                    </ul>
+                <div v-else-if="list.length > 6 ">
+                    MORE
+                </div>
+                <div v-else>
+                    ALL
+                </div>
+            </div>
+            <h2 class="hr">
+                <span>Skills</span>
+            </h2>
+            <ul class="skill-list non-style-list">
+                <li v-for='(item, key) in list3' class="post-list-item">{{key}}、{{item.name}}</li>
+            </ul>
+            <h2 :class=[hrClass,testClass]>
+                <span>Contact</span>
+            </h2>
+            <my-component></my-component>
         </div>
-
+        <footer-vue :fooPro="author" @click="doThis(arg1)"></footer-vue>
+        <div class="layout-bg"></div>
     </div>
     <script src="blog.js"></script>
 </body>
