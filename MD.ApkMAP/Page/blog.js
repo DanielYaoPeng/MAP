@@ -132,6 +132,33 @@ let vm = new Vue({
         console.log("%c%s", "color:red", "author: " + this.author);
         debugger;//打断点
     },
+    updated: function () {
+        //更新数据，页面渲染
+        console.group('updated 更新完成状态===============》');
+        console.log("%c%s", "color:red", "el     : " + this.$el);
+        console.log(this.$el);
+        console.log("%c%s", "color:red", "data   : " + this.$data);
+        console.log("%c%s", "color:red", "author: " + this.author);
+        debugger;
+    },
+    beforeDestroy: function () {
+        //调用实例的destroy( )方法可以销毁当前的组件，在销毁前，会触发beforeDestroy钩子。
+        console.group('beforeDestroy 销毁前状态===============》');
+        console.log("%c%s", "color:red", "el     : " + this.$el);
+        console.log(this.$el);
+        console.log("%c%s", "color:red", "data   : " + this.$data);
+        console.log("%c%s", "color:red", "author: " + this.author);
+        debugger;
+    },
+    destroyed: function () {
+        //成功销毁之后，会触发 destroyed 钩子，此时该实例与其他实例的关联已经被清除，它与视图之间也被解绑，控制 Data 已经不能控制页面，也无法双向绑定。
+        console.group('destroyed 销毁完成状态===============》');
+        console.log("%c%s", "color:red", "el     : " + this.$el);
+        console.log(this.$el);
+        console.log("%c%s", "color:red", "data   : " + this.$data);
+        console.log("%c%s", "color:red", "author: " + this.author);
+        debugger;
+    },
     methods: {
         addArticle() {
             this.list = this.list.reverse();
