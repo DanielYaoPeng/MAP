@@ -142,16 +142,16 @@ let vm = new Vue({
             });
         },
         nameCpt() {
-            return this.task.name
+            return this.task.name;
         }
     },
     watch: {
         nameCpt() {
             //这里面可以执行一旦监听的值发生变化你想做的操作
-            console.log("变啦变啦！")
+            console.log("变啦变啦！");
         },
         deep: true //表示监视对象的属性变化
-    },
+    }
 });
 
 
@@ -163,5 +163,5 @@ function initTask(name = "") {
         date: " Just Now ",
         finished: false, //未完成
         deleted: false //未删除
-    }
-};
+    };
+}
