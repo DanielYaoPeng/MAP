@@ -93,7 +93,7 @@ let vm = new Vue({
             {
                 name: "ASP.NET"
             }
-        ],
+        ]
     },
     beforeCreate() {
         console.group('beforeCreate 创建前状态===============》');
@@ -122,6 +122,15 @@ let vm = new Vue({
         console.log(this.$el);
         console.log("%c%s", "color:red", "data   : " + this.$data); //已被初始化
         console.log("%c%s", "color:red", "author: " + this.author); //已被初始化 
+    },
+    beforeUpdate: function () {
+        //更新前（修改Data，但未渲染至页面）
+        console.group('beforeUpdate 更新前状态===============》');
+        console.log("%c%s", "color:red", "el     : " + this.$el);
+        console.log(this.$el);
+        console.log("%c%s", "color:red", "data   : " + this.$data);
+        console.log("%c%s", "color:red", "author: " + this.author);
+        debugger;//打断点
     },
     methods: {
         addArticle() {
