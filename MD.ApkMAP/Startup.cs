@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Engine;
 using Autofac.Extensions.DependencyInjection;
 using MD.ApkMAP.AOP;
 using MD.ApkMAP.AuthHelper.OverWrite;
@@ -14,8 +15,10 @@ using MD.ApkMAP.AuthHelper.Policys;
 using MD.ApkMAP.Common.GlobalVar;
 using MD.ApkMAP.IRepository;
 using MD.ApkMAP.IServices;
+using MD.ApkMAP.IServices.Base;
 using MD.ApkMAP.Repository;
 using MD.ApkMAP.Services;
+using MD.ApkMAP.Services.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -188,7 +191,7 @@ namespace MD.ApkMAP
             #endregion
 
             #endregion
-
+            
 
         }
 
@@ -199,29 +202,35 @@ namespace MD.ApkMAP
             ConfigureServices 不能是返回类型了，只能是 void 方法，那我们就不用 return 出去了，
             官方给我们提供了一个服务提供上工厂，我们从这个工厂里拿，而不是将服务配置 return 出去
             */
-            var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
+            //var basePath = Microsoft.DotNet.PlatformAbstractions.ApplicationEnvironment.ApplicationBasePath;
 
-            // builder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
+            //// builder.RegisterType<ApkMapMemoryCache>().As<ICaching>().InstancePerDependency();
 
-            var servicesDllFile = Path.Combine(basePath, "MD.ApkMAP.Services.dll");
-            var assemblysServices = Assembly.LoadFrom(servicesDllFile);//直接采用加载文件的方法  ※※★※※ 如果你是第一次下载项目，请先F6编译，然后再F5执行，※※★※※
+            //var servicesDllFile = Path.Combine(basePath, "MD.ApkMAP.Services.dll");
+            //var assemblysServices = Assembly.LoadFrom(servicesDllFile);//直接采用加载文件的方法  ※※★※※ 如果你是第一次下载项目，请先F6编译，然后再F5执行，※※★※※
 
-            var repositoryDllFile = Path.Combine(basePath, "MD.ApkMAP.Repository.dll");
-            var assemblysRepository = Assembly.LoadFrom(repositoryDllFile);
+            //var repositoryDllFile = Path.Combine(basePath, "MD.ApkMAP.Repository.dll");
+            //var assemblysRepository = Assembly.LoadFrom(repositoryDllFile);
 
+            
+            //Autofac.Engine.EngineContext.Initialize();
 
+            //builder.RegisterAssemblyTypes(assemblysServices)
+            //              .AsImplementedInterfaces()
+            //              .InstancePerLifetimeScope();
 
-            builder.RegisterAssemblyTypes(assemblysServices)
-                          .AsImplementedInterfaces()
-                          .InstancePerLifetimeScope();
-
-            builder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
+            //builder.RegisterAssemblyTypes(assemblysRepository).AsImplementedInterfaces();
 
 
 
             //***第二种注册方式，单个一一注册
-            //containerBuilder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
-            //containerBuilder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
+            builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
+            builder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
+            builder.RegisterType<SysUserInfoServices>().As<ISysUserInfoServices>().InstancePerDependency();
+            builder.RegisterType<RoleModulePermissionServices>().As<IRoleModulePermissionServices>().InstancePerDependency();
+            //builder.RegisterType<BaseServices>().As<IBaseServices>().InstancePerDependency();
+            
+
             //将services填充到Autofac容器生成器中
             //containerBuilder.Populate(services);
 
