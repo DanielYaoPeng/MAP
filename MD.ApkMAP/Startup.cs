@@ -228,8 +228,15 @@ namespace MD.ApkMAP
             builder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
             builder.RegisterType<SysUserInfoServices>().As<ISysUserInfoServices>().InstancePerDependency();
             builder.RegisterType<RoleModulePermissionServices>().As<IRoleModulePermissionServices>().InstancePerDependency();
+
+            /*注入生命周期
+             *   InstancePerDependency() 每个依赖一个实例。(每次都会返回一个新的实例，并且这是默认的生命周期。)
+             *   SingleInstance() 单例，所有服务请求都将会返回同一个实例。(无论您请求何处，都始终获得相同的实例。)
+             *   InstancePerLifetimeScope 每个匹配的生命周期作用域一个实例(在解决每个生命周期实例作用域组件时，每个嵌套作用域将获得一个实例（例如，每个工作单元）)
+             */
+
             //builder.RegisterType<BaseServices>().As<IBaseServices>().InstancePerDependency();
-            
+
 
             //将services填充到Autofac容器生成器中
             //containerBuilder.Populate(services);
