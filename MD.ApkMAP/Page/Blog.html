@@ -32,7 +32,9 @@
 </head>
 
 <body>
+
     <div id="app">
+
         <header>
             <div class="description">
                 <div style="background-image: url(https://pic.cnblogs.com/avatar/1468246/20180817230353.png); width: 128px; height: 128px; background-size: cover; border-radius: 50%; margin: 0 auto;"
@@ -82,6 +84,7 @@
                     <!--还可以这样写-->
                     <!--<a :href="liskUrl">{{item.name}}</a>-->
                     <span class="post-list-date">({{item.date}})</span>
+                    <button @click="removeArticle($index)">删除</button>
                 </li>
             </ul>
             <div>
@@ -104,10 +107,12 @@
             <h2 :class=[hrClass,testClass]>
                 <span>Contact</span>
             </h2>
-            <my-component></my-component>
+            <!-- <my-component></my-component> -->
+            <mycomponent></mycomponent>
         </div>
         <footer-vue :fooPro="author" @click="doThis(arg1)"></footer-vue>
         <div class="layout-bg"></div>
+
     </div>
     <script src="blog.js"></script>
 </body>
