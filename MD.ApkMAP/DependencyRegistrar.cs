@@ -11,18 +11,18 @@ using MD.ApkMAP.Services;
 
 namespace MD.ApkMAP
 {
-    //public class DependencyRegistrar: IDependencyRegistrar
-    //{
+    public class DependencyRegistrar : IDependencyRegistrar
+    {
 
-    //    public int Order => 1;
+        public int Order => 1;
 
-    //    public void Register(ContainerBuilder builder, ITypeFinder typeFinder)
-    //    {
-    //        //泛型类型的注册
-    //        //builder.RegisterGeneric(typeof(BaseRepository<>)).As(typeof(IRepository<>)).SingleInstance();
+        public void Register(ContainerBuilder builder, ITypeFinder typeFinder)
+        {
+            //泛型类型的注册
+            //builder.RegisterGeneric(typeof(BaseRepository<>)).As(typeof(IRepository<>)).SingleInstance();
 
-    //        builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
-    //        builder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
-    //    }
-    //}
+            builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
+            builder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
+        }
+    }
 }

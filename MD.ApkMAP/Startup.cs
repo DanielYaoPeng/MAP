@@ -188,6 +188,8 @@ namespace MD.ApkMAP
             services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
             services.AddSingleton(permissionRequirement);
 
+           // services.AddAutofac();
+
             #endregion
 
             #endregion
@@ -223,6 +225,7 @@ namespace MD.ApkMAP
 
 
 
+
             //***第二种注册方式，单个一一注册
             builder.RegisterType<AdvertisementServices>().As<IAdvertisementServices>().InstancePerDependency();
             builder.RegisterType<AdvertisementRepository>().As<IAdvertisementRepository>().InstancePerDependency();
@@ -239,7 +242,9 @@ namespace MD.ApkMAP
 
 
             //将services填充到Autofac容器生成器中
-            //containerBuilder.Populate(services);
+           // builder.Populate();
+           // EngineContext.Initialize(builder);
+
 
         }
 
