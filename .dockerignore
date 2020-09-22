@@ -7,3 +7,11 @@
 */bin
 */obj
 **/.toolstarget
+
+
+**/appsettings.json
+**/autoFac.json
+
+**/Dockerfile
+**/docker-compose.yml
+**/*.md

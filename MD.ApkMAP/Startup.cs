@@ -272,7 +272,7 @@ namespace MD.ApkMAP
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseMiddleware<JwtTokenAuth>();//自定义中间件
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
